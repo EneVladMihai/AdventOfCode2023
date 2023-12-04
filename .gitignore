@@ -1,0 +1,7 @@
+# Executables
+*/*.o
+*/*.exe
+*/*.hi
+
+# Puzzle input
+*/input.txt
