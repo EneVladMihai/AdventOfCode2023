@@ -1,7 +1,6 @@
 import System.Environment
 import Data.List (group, sort, sortBy)
 import Data.Char (isDigit, digitToInt)
-import Control.Arrow ( Arrow((&&&)) ) 
 
 -- Part 1
 data Hand = Hand {
