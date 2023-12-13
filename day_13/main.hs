@@ -16,11 +16,6 @@ indexed = zip [0..]
 transpose :: [String] -> [String]
 transpose rows = (\(colHeadIdx, _) -> map (!! colHeadIdx) rows) <$> indexed (head rows)
 
-dropEnds :: [a] -> [a]
-dropEnds l
-    | length l > 2 = init.tail $ l
-    | otherwise = []
-
 isMirrorIdx :: [String] -> Int -> Bool
 isMirrorIdx rows i
     | null left || null right = False
