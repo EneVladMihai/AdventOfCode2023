@@ -1,5 +1,5 @@
 import System.Environment
-import Data.List (findIndex, isPrefixOf)
+import Data.List (findIndex, isPrefixOf, transpose)
 import Control.Arrow ((&&&), (***))
 import Data.Maybe (catMaybes)
 
@@ -13,15 +13,12 @@ parse rows = grid : parse rest where
 indexed :: [b] -> [(Int, b)]
 indexed = zip [0..]
 
-transpose :: [String] -> [String]
-transpose rows = (\(colHeadIdx, _) -> map (!! colHeadIdx) rows) <$> indexed (head rows)
-
 isMirrorIdx :: [String] -> Int -> Bool
 isMirrorIdx rows i
     | null left || null right = False
-    | otherwise = left `isPrefixOf` right || right `isPrefixOf` left
+    | otherwise = and (zipWith (==) (reverse left) right)
         where
-            left = reverse $ take i rows
+            left = take i rows
             right = drop i rows
 
 findMirrorIdx :: [String] -> Maybe Int
@@ -41,13 +38,10 @@ countDiffs l1 l2 = sum . map fromEnum $ zipWith (/=) l1 l2
 isSmudgedMirrorIdx :: [String] -> Int -> Bool
 isSmudgedMirrorIdx rows i
     | null left || null right = False
-    | otherwise = 1 == sum (zipWith countDiffs trimmedL trimmedR)
+    | otherwise = 1 == sum (zipWith countDiffs (reverse left) right)
         where
-            left = reverse $ take i rows
+            left = take i rows
             right = drop i rows
-            minLen = min (length left) (length right)
-            trimmedL = take minLen left
-            trimmedR = take minLen right
 
 findSmudgedIdx :: [String] -> Maybe Int
 findSmudgedIdx rows = findIndex (isSmudgedMirrorIdx rows) [0..length rows]
