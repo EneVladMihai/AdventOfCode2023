@@ -27,14 +27,37 @@ isMirrorIdx rows i
 findMirrorIdx :: [String] -> Maybe Int
 findMirrorIdx rows = findIndex (isMirrorIdx rows) [0..length rows]
 
-summarise :: [String] -> (Maybe Int, Maybe Int)
-summarise = (findMirrorIdx.transpose) &&& findMirrorIdx
+findReflextion :: [String] -> (Maybe Int, Maybe Int)
+findReflextion = (findMirrorIdx.transpose) &&& findMirrorIdx
 
-part1 :: [[String]] -> Int
-part1 input = cols + 100 * rows where
-    (cols, rows) = (sum.catMaybes *** sum.catMaybes) . unzip . fmap summarise $ input
+summarise :: [[String]] -> Int
+summarise input = cols + 100 * rows where
+    (cols, rows) = (sum.catMaybes *** sum.catMaybes) . unzip . fmap findReflextion $ input
 
 -- Part 2
+countDiffs :: Eq a => [a] -> [a] -> Int
+countDiffs l1 l2 = sum . map fromEnum $ zipWith (/=) l1 l2
+
+isSmudgedMirrorIdx :: [String] -> Int -> Bool
+isSmudgedMirrorIdx rows i
+    | null left || null right = False
+    | otherwise = 1 == sum (zipWith countDiffs trimmedL trimmedR)
+        where
+            left = reverse $ take i rows
+            right = drop i rows
+            minLen = min (length left) (length right)
+            trimmedL = take minLen left
+            trimmedR = take minLen right
+
+findSmudgedIdx :: [String] -> Maybe Int
+findSmudgedIdx rows = findIndex (isSmudgedMirrorIdx rows) [0..length rows]
+
+findSmudge :: [String] -> (Maybe Int, Maybe Int)
+findSmudge = (findSmudgedIdx.transpose) &&& findSmudgedIdx
+
+summarise2 :: [[String]] -> Int
+summarise2 input = cols + 100 * rows where
+    (cols, rows) = (sum.catMaybes *** sum.catMaybes) . unzip . fmap findSmudge $ input
 
 main :: IO ()
 main = do
@@ -42,4 +65,5 @@ main = do
     content <- readFile (args !! 0)
     let rows = lines content
 
-    print $ part1.parse $ rows
+    print $ summarise.parse $ rows
+    print $ summarise2.parse $ rows
